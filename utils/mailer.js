@@ -1,3 +1,5 @@
+import dotenv from 'dotenv'
+dotenv.config()
 import { createTransport } from 'nodemailer'
 import Email from 'email-templates'
 

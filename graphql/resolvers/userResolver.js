@@ -11,9 +11,6 @@ import { arrayEqual, ranking } from './merge.js'
 import { mailer } from '../../utils/mailer.js'
 
 
-
-
-
 export default {
     Query: {
         userInfo: async (_, args, context) => {
@@ -62,11 +59,6 @@ export default {
         registerUser: async (_, { userInput: { name, email, password } }) => {
             console.log("registerUser", name, email, password);
 
-            // const transporter = nodemailer.createTransport(sendGridTransport({
-            //     auth: {
-            //         api_key: process.env.SENDGRID_API
-            //     }
-            // }))
             const user = await User.findOne({ email })
             if (user) {
                 throw new Error('Email already used')
@@ -90,12 +82,6 @@ export default {
                     mailer(result.email, result.name, result.verificationCode)
                 }
 
-                // transporter.sendMail({
-                //     to: result.email,
-                //     from: process.env.MY_EMAIL,
-                //     subject: "Registration Verification",
-                //     html: `<h1>Welcome to Insta-Learn</h1><div><br /><p>Your verification code: ${verificationCode} </p></div>`
-                // })
                 return { ...result._doc }
             }
             catch (err) {
