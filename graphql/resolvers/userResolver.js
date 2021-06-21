@@ -78,7 +78,7 @@ export default {
                 const result = await user.save()
 
 
-                if(result) {
+                if (result) {
                     mailer(result.email, result.name, result.verificationCode)
                 }
 
@@ -175,6 +175,35 @@ export default {
                     }, process.env.JWT_SECRET, { expiresIn: '10h' })
                     return { ...user._doc, token: newToken }
                 }
+            }
+            catch (err) {
+                throw new Error(err)
+            }
+        },
+        tryDemo: async (_, __,) => {
+            console.log("tryDemo");
+            try {
+                const users = await User.find()
+                const guests = users.filter(user => user.name.split('_')[0] === "Guest")
+                const name = `Guest_${guests.length + 1}`
+                const email = `${name}@guest.com`
+                const hashedPassword = await bcrypt.hash(email, 12)
+
+                const newGuest = await new User({
+                    name: name,
+                    email: email,
+                    photo: "https://res.cloudinary.com/rommel/image/upload/v1601204560/tk58aebfctjwz7t74qya.jpg",
+                    password: hashedPassword,
+                    verified: true
+                })
+                const result = await newGuest.save()
+                const newToken = jwt.sign({
+                    _id: result._id,
+                    email: result.email,
+                    name: result.name,
+                    photo: result.photo
+                }, process.env.JWT_SECRET, { expiresIn: '1h' })
+                return { ...result._doc, token: newToken }
             }
             catch (err) {
                 throw new Error(err)

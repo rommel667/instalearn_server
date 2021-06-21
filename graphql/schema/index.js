@@ -161,6 +161,7 @@ const typeDefs = gql`
         registerUser(userInput: UserInput!): User!
         verifyUser(email: String!, code: String!): User!
         signInWithGoogle(name: String!, email: String!, photo: String!, token: String!): User!
+        tryDemo: User!
         editProfile(_id: String!, name: String!, photo:String!) : User!
         submitResultExam(correctArray: [String]!, wrongArray: [String]!): User!
         submitResultQuiz(correctArray: [String]!, wrongArray: [String]!): User!
