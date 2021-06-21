@@ -43,6 +43,6 @@ mongoose.connect(process.env.MONGO_URI, {
     return httpServer.listen(process.env.PORT)
 })
 .then(res => {
-    console.log(`GraphQL Server running at http://localhost:4000${server.graphqlPath}`);
+    console.log(`GraphQL Server running at http://localhost:${process.env.PORT}${server.graphqlPath}`);
 })
 

@@ -211,9 +211,7 @@ export default {
         },
         submitResultExam: async (_, { correctArray, wrongArray }, context) => {
             console.log("submitResultExam");
-
             try {
-
                 const userCon = await checkAuth(context)
                 const user = await User.findOne({ email: userCon.email })
 
@@ -324,7 +322,6 @@ export default {
             try {
                 const userCon = await checkAuth(context)
                 const user = await User.findOne({ email: userCon.email })
-
                 let correctCategories = [...user.correctQuizCategory]
                 let correctSubcategories = [...user.correctQuizSubcategory]
                 let wrongCategories = [...user.wrongQuizCategory]
@@ -332,19 +329,22 @@ export default {
 
                 if (correctArray.length > 0) {
                     const correctQuestions = await Question.find({ _id: { $in: correctArray } })
-
                     correctQuestions.map(cq => {
+                    console.log("CORRECT",correctQuestions);
                         if (correctCategories.length === 0) {
-                            correctCategories.push(Object.assign({}, { type: cq.category, count: 1 }))
+                            correctCategories.push(Object.assign({}, { category: cq.category, count: 1 }))
                         } else {
-                            if (correctCategories.every(v => v.type === cq.category)) {
+
+                            
+
+                            if (correctCategories.some(el => el.category.toString() === cq.category.toString())) {
                                 correctCategories.map(w => {
-                                    if (w.type === cq.category) {
+                                    if (w.category.toString() === cq.category.toString()) {
                                         w.count = w.count + 1
                                     }
                                 })
                             } else {
-                                correctCategories.push([...correctCategories, Object.assign({}, { type: cq.category, count: 1 })])
+                                correctCategories = [...correctCategories, Object.assign({}, { category: cq.category, count: 1 })]
                             }
                         }
 
@@ -352,16 +352,16 @@ export default {
 
                     correctQuestions.map(cq => {
                         if (correctSubcategories.length === 0) {
-                            correctSubcategories.push(Object.assign({}, { type: cq.subcategory, count: 1 }))
+                            correctSubcategories.push(Object.assign({}, { subcategory: cq.subcategory, count: 1 }))
                         } else {
-                            if (correctSubcategories.every(v => v.type === cq.subcategory)) {
+                            if (correctSubcategories.some(el => el.subcategory.toString() === cq.subcategory.toString())) {
                                 correctSubcategories.map(w => {
-                                    if (w.type === cq.subcategory) {
+                                    if (w.subcategory.toString() === cq.subcategory.toString()) {
                                         w.count = w.count + 1
                                     }
                                 })
                             } else {
-                                correctSubcategories.push([...correctSubcategories, Object.assign({}, { type: cq.subcategory, count: 1 })])
+                                correctSubcategories = [...correctSubcategories, Object.assign({}, { subcategory: cq.subcategory, count: 1 })]
                             }
                         }
 
@@ -370,19 +370,19 @@ export default {
 
                 if (wrongArray.length > 0) {
                     const wrongQuestions = await Question.find({ _id: { $in: wrongArray } })
-
+                    console.log("WRONG",wrongQuestions);
                     wrongQuestions.map(cq => {
                         if (wrongCategories.length === 0) {
-                            wrongCategories.push(Object.assign({}, { type: cq.category, count: 1 }))
+                            wrongCategories.push(Object.assign({}, { category: cq.category, count: 1 }))
                         } else {
-                            if (wrongCategories.every(v => v.type === cq.category)) {
+                            if (wrongCategories.some(el => el.category.toString() === cq.category.toString())) {
                                 wrongCategories.map(w => {
-                                    if (w.type === cq.category) {
+                                    if (w.category.toString() === cq.category.toString()) {
                                         w.count = w.count + 1
                                     }
                                 })
                             } else {
-                                wrongCategories.push([...wrongCategories, Object.assign({}, { type: cq.category, count: 1 })])
+                                wrongCategories = [...wrongCategories, Object.assign({}, { category: cq.category, count: 1 })]
                             }
                         }
 
@@ -390,21 +390,23 @@ export default {
 
                     wrongQuestions.map(cq => {
                         if (wrongSubcategories.length === 0) {
-                            wrongSubcategories.push(Object.assign({}, { type: cq.subcategory, count: 1 }))
+                            wrongSubcategories.push(Object.assign({}, { subcategory: cq.subcategory, count: 1 }))
                         } else {
-                            if (wrongSubcategories.every(v => v.type === cq.subcategory)) {
+                            if (wrongSubcategories.some(el => el.subcategory.toString() === cq.subcategory.toString())) {
                                 wrongSubcategories.map(w => {
-                                    if (w.type === cq.subcategory) {
+                                    if (w.subcategory.toString() === cq.subcategory.toString()) {
                                         w.count = w.count + 1
                                     }
                                 })
                             } else {
-                                wrongSubcategories.push([...wrongSubcategories, Object.assign({}, { type: cq.subcategory, count: 1 })])
+                                wrongSubcategories = [...wrongSubcategories, Object.assign({}, { subcategory: cq.subcategory, count: 1 })]
                             }
                         }
 
                     })
                 }
+
+                console.log("CC",correctCategories, "WC",wrongCategories, "CS",correctSubcategories, "WS",wrongSubcategories);
 
                 if (user) {
                     user.correctQuizArray.push(correctArray)
@@ -426,6 +428,117 @@ export default {
                 throw new Error(err)
             }
         },
+        // submitResultQuiz: async (_, { correctArray, wrongArray }, context) => {
+        //     console.log("submitResultQuiz", correctArray, wrongArray);
+
+        //     try {
+        //         const userCon = await checkAuth(context)
+        //         const user = await User.findOne({ email: userCon.email })
+        //         console.log(user);
+
+        //         let correctCategories = [...user.correctQuizCategory]
+        //         let correctSubcategories = [...user.correctQuizSubcategory]
+        //         let wrongCategories = [...user.wrongQuizCategory]
+        //         let wrongSubcategories = [...user.wrongQuizSubcategory]
+
+        //         if (correctArray.length > 0) {
+        //             const correctQuestions = await Question.find({ _id: { $in: correctArray } })
+        //             console.log("CORRECT",correctQuestions);
+        //             correctQuestions.map(cq => {
+        //                 if (correctCategories.length === 0) {
+        //                     correctCategories.push(Object.assign({}, { type: cq.category, count: 1 }))
+        //                 } else {
+        //                     if (correctCategories.every(v => v.type === cq.category)) {
+        //                         correctCategories.map(w => {
+        //                             if (w.type === cq.category) {
+        //                                 w.count = w.count + 1
+        //                             }
+        //                         })
+        //                     } else {
+        //                         correctCategories.push([...correctCategories, Object.assign({}, { type: cq.category, count: 1 })])
+        //                     }
+        //                 }
+
+        //             })
+
+        //             correctQuestions.map(cq => {
+        //                 if (correctSubcategories.length === 0) {
+        //                     correctSubcategories.push(Object.assign({}, { type: cq.subcategory, count: 1 }))
+        //                 } else {
+        //                     if (correctSubcategories.every(v => v.type === cq.subcategory)) {
+        //                         correctSubcategories.map(w => {
+        //                             if (w.type === cq.subcategory) {
+        //                                 w.count = w.count + 1
+        //                             }
+        //                         })
+        //                     } else {
+        //                         correctSubcategories.push([...correctSubcategories, Object.assign({}, { type: cq.subcategory, count: 1 })])
+        //                     }
+        //                 }
+
+        //             })
+        //         }
+
+        //         if (wrongArray.length > 0) {
+        //             const wrongQuestions = await Question.find({ _id: { $in: wrongArray } })
+        //             console.log("WRONG",wrongQuestions);
+        //             wrongQuestions.map(cq => {
+        //                 if (wrongCategories.length === 0) {
+        //                     wrongCategories.push(Object.assign({}, { type: cq.category, count: 1 }))
+        //                 } else {
+        //                     if (wrongCategories.every(v => v.type === cq.category)) {
+        //                         wrongCategories.map(w => {
+        //                             if (w.type === cq.category) {
+        //                                 w.count = w.count + 1
+        //                             }
+        //                         })
+        //                     } else {
+        //                         wrongCategories.push([...wrongCategories, Object.assign({}, { type: cq.category, count: 1 })])
+        //                     }
+        //                 }
+
+        //             })
+
+        //             wrongQuestions.map(cq => {
+        //                 if (wrongSubcategories.length === 0) {
+        //                     wrongSubcategories.push(Object.assign({}, { type: cq.subcategory, count: 1 }))
+        //                 } else {
+        //                     if (wrongSubcategories.every(v => v.type === cq.subcategory)) {
+        //                         wrongSubcategories.map(w => {
+        //                             if (w.type === cq.subcategory) {
+        //                                 w.count = w.count + 1
+        //                             }
+        //                         })
+        //                     } else {
+        //                         wrongSubcategories.push([...wrongSubcategories, Object.assign({}, { type: cq.subcategory, count: 1 })])
+        //                     }
+        //                 }
+
+        //             })
+        //         }
+
+        //         console.log(correctCategories, wrongCategories, correctSubcategories, wrongSubcategories);
+
+        //         if (user) {
+        //             user.correctQuizArray.push(correctArray)
+        //             user.wrongQuizArray.push(wrongArray)
+        //             user.correctQuizCategory = correctCategories
+        //             user.wrongQuizCategory = wrongCategories
+        //             user.correctQuizSubcategory = correctSubcategories
+        //             user.wrongQuizSubcategory = wrongSubcategories
+        //             const result = await user.save()
+        //             ranking(result, user._id, context)
+        //             return {
+        //                 ...result._doc
+        //             }
+        //         }
+
+
+        //     }
+        //     catch (err) {
+        //         throw new Error(err)
+        //     }
+        // },
 
     }
 
